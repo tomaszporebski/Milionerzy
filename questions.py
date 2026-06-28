@@ -1,23 +1,51 @@
+import html
 import json
-from pathlib import Path
+import random
+from urllib.parse import urlencode
+from urllib.request import urlopen
 
 
-def load_questions(file_path: str) -> dict:
-    """Ładuje pytania z pliku JSON.
+API_URL = "https://opentdb.com/api.php"
 
-    Funkcja otwiera podany plik JSON, odczytuje jego zawartość i zwraca
-    strukturę danych (słownik), która zawiera pytania pogrupowane według
-    trudności.
 
-    Args:
-        file_path (str): Ścieżka do pliku JSON z pytaniami.
+def convert_api_question(api_question: dict) -> dict:
+    question_text = html.unescape(api_question["question"])
+    correct_answer = html.unescape(api_question["correct_answer"])
 
-    Returns:
-        dict: Struktura danych zawierająca pytania pogrupowane po trudności.
-    """
-    path = Path(file_path)
+    incorrect_answers = [
+        html.unescape(answer)
+        for answer in api_question["incorrect_answers"]
+    ]
 
-    with path.open("r", encoding="utf-8") as file:
-        data = json.load(file)
+    answers = incorrect_answers + [correct_answer]
+    random.shuffle(answers)
 
-    return data
+    correct_index = answers.index(correct_answer)
+
+    return {
+        "question": question_text,
+        "answers": answers,
+        "correct": correct_index
+    }
+
+
+def load_questions(amount: int = 12) -> list:
+    query_params = urlencode({
+        "amount": amount,
+        "type": "multiple"
+    })
+
+    url = f"{API_URL}?{query_params}"
+
+    with urlopen(url, timeout=10) as response:
+        data = json.load(response)
+
+    if data["response_code"] != 0:
+        raise ValueError("Nie udało się pobrać pytań z Open Trivia Database API.")
+
+    questions = [
+        convert_api_question(api_question)
+        for api_question in data["results"]
+    ]
+
+    return questions
