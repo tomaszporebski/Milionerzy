@@ -1,223 +1,209 @@
-<div align="center">
+# Milionerzy — projekt w Pythonie
 
-🎮 Milionerzy — Python Console Game
+## Opis projektu
 
-Prosta konsolowa wersja gry „Milionerzy” napisana w języku Python.
-Projekt wykorzystuje zewnętrzne API do pobierania pytań quizowych.
+Projekt jest prostą konsolową wersją gry „Milionerzy” napisaną w Pythonie.
 
-<br>
+Gracz odpowiada na pytania jednokrotnego wyboru. Każde pytanie ma cztery odpowiedzi: A, B, C i D. Za poprawną odpowiedź gracz przechodzi do kolejnego pytania i zdobywa wyższą kwotę. Po błędnej odpowiedzi gra się kończy, a wynik zostaje zapisany do pliku.
 
+W aktualnej wersji pytania są pobierane z zewnętrznego API Open Trivia Database.
 
+## Funkcjonalności
 
+* gra działa w konsoli,
+* pytania są pobierane z zewnętrznego API,
+* każde pytanie ma cztery odpowiedzi,
+* tylko jedna odpowiedź jest poprawna,
+* gra posiada progi wygranej,
+* dostępne są trzy koła ratunkowe:
 
+  * 50/50,
+  * pytanie do publiczności,
+  * telefon do przyjaciela,
+* wynik gry jest zapisywany do pliku JSON,
+* projekt zawiera podstawowe testy jednostkowe.
 
+## Zewnętrzne API
 
+Projekt korzysta z Open Trivia Database API:
 
-</div>
-
-📌 Spis treści
-Opis projektu
-Najważniejsze funkcjonalności
-Zewnętrzne API
-Koła ratunkowe
-Struktura projektu
-Jak uruchomić projekt
-Jak grać
-Testy
-Technologie
-Cel projektu
-🧾 Opis projektu
-
-Projekt jest konsolową wersją gry „Milionerzy”.
-
-Gracz odpowiada na pytania jednokrotnego wyboru. Każde pytanie ma cztery możliwe odpowiedzi:
-
-A, B, C, D
-
-Tylko jedna odpowiedź jest poprawna. Za każdą poprawną odpowiedź gracz przechodzi dalej i zdobywa coraz większą kwotę.
-
-Pytania nie są zapisane lokalnie w projekcie. Program pobiera je z zewnętrznego API — Open Trivia Database.
-
-✨ Najważniejsze funkcjonalności
-Funkcjonalność	Opis
-🎮 Gra konsolowa	Cała rozgrywka odbywa się w terminalu
-🌐 Pytania z API	Pytania są pobierane z Open Trivia Database
-✅ Jedna poprawna odpowiedź	Każde pytanie ma dokładnie jedną poprawną odpowiedź
-💰 Progi wygranej	Gracz zdobywa kolejne kwoty za poprawne odpowiedzi
-🛟 Koła ratunkowe	Dostępne są 3 koła ratunkowe
-💾 Zapis wyników	Wynik końcowy jest zapisywany do pliku JSON
-🧪 Testy	Projekt zawiera proste testy jednostkowe
-🌐 Zewnętrzne API
-
-Projekt korzysta z API:
-
-Open Trivia Database
+```text
 https://opentdb.com/
+```
 
-API służy do pobierania pytań quizowych.
+API służy do pobierania pytań quizowych. W projekcie pobierane są pytania typu `multiple`, czyli pytania z czterema odpowiedziami.
 
-Program pobiera pytania typu:
+Przykładowy adres zapytania:
 
-multiple
-
-czyli pytania z czterema odpowiedziami i jedną poprawną odpowiedzią.
-
-Przykładowy adres API:
-
+```text
 https://opentdb.com/api.php?amount=12&type=multiple
+```
 
 Znaczenie parametrów:
 
-Parametr	Znaczenie
-amount=12	pobranie 12 pytań
-type=multiple	pobranie pytań z czterema odpowiedziami
+* `amount=12` — pobranie 12 pytań,
+* `type=multiple` — pobranie pytań z czterema odpowiedziami.
 
-Po pobraniu danych z API program przekształca pytanie do formatu używanego przez grę:
+Dane zwracane przez API są przekształcane na format używany w grze:
 
+```python
 {
     "question": "Treść pytania",
     "answers": ["Odpowiedź A", "Odpowiedź B", "Odpowiedź C", "Odpowiedź D"],
     "correct": 2
 }
+```
 
-Pole correct przechowuje indeks poprawnej odpowiedzi.
+Pole `correct` oznacza indeks poprawnej odpowiedzi w liście `answers`.
 
-Przykład:
+## Koła ratunkowe
 
-"answers": ["Berlin", "Paryż", "Madryt", "Rzym"],
-"correct": 1
+W grze dostępne są trzy koła ratunkowe.
 
-Oznacza to, że poprawną odpowiedzią jest:
+### 50/50
 
-answers[1]
+Usuwa dwie błędne odpowiedzi i zostawia jedną poprawną oraz jedną błędną.
 
-czyli:
+Komenda w grze:
 
-Paryż
-🛟 Koła ratunkowe
+```text
+50
+```
 
-W grze dostępne są trzy koła ratunkowe:
+### Pytanie do publiczności
 
-Koło ratunkowe	Komenda	Opis
-50/50	50	Usuwa dwie błędne odpowiedzi
-Publiczność	P	Pokazuje procentowe głosy publiczności
-Telefon do przyjaciela	T	Przyjaciel sugeruje poprawną odpowiedź
+Pokazuje procentowe głosy publiczności dla każdej odpowiedzi.
 
-Każde koło ratunkowe może zostać użyte tylko raz w trakcie gry.
+Komenda w grze:
 
-📁 Struktura projektu
+```text
+P
+```
+
+### Telefon do przyjaciela
+
+Wyświetla sugestię poprawnej odpowiedzi.
+
+Komenda w grze:
+
+```text
+T
+```
+
+Każde koło ratunkowe można wykorzystać tylko raz w trakcie gry.
+
+## Struktura projektu
+
+```text
 Milionerzy/
-├── main.py              # główny plik uruchamiający grę
-├── game.py              # logika zadawania pytań i sprawdzania odpowiedzi
-├── questions.py         # pobieranie i przygotowanie pytań z API
-├── lifelines.py         # obsługa kół ratunkowych
-├── results.py           # zapisywanie wyników gry
-├── config.py            # konfiguracja progów wygranej
-├── utils.py             # funkcje pomocnicze
+├── main.py
+├── game.py
+├── questions.py
+├── lifelines.py
+├── results.py
+├── config.py
+├── utils.py
 ├── data/
-│   └── results.json     # zapisane wyniki graczy
+│   └── results.json
 ├── tests/
 │   ├── test_utils.py
 │   ├── test_lifelines.py
 │   └── test_questions.py
 └── README.md
-🚀 Jak uruchomić projekt
-1. Pobierz projekt
+```
 
-Można sklonować repozytorium:
+Krótki opis najważniejszych plików:
 
-git clone https://github.com/tomaszporebski/Milionerzy.git
+* `main.py` — uruchamia grę i obsługuje główny przebieg programu,
+* `game.py` — odpowiada za zadawanie pytań i sprawdzanie odpowiedzi,
+* `questions.py` — pobiera pytania z API i przygotowuje je do użycia w grze,
+* `lifelines.py` — zawiera logikę kół ratunkowych,
+* `results.py` — zapisuje wynik gry do pliku,
+* `config.py` — przechowuje progi wygranej,
+* `utils.py` — zawiera funkcje pomocnicze,
+* `tests/` — zawiera testy jednostkowe.
 
-Następnie przejść do folderu projektu:
+## Uruchomienie projektu
 
-cd Milionerzy
-2. Uruchom grę
+Do uruchomienia projektu potrzebny jest Python 3.
+
+Po pobraniu repozytorium należy przejść do folderu projektu i uruchomić:
+
+```bash
 python main.py
+```
 
-Jeżeli na Windowsie komenda python nie działa, można użyć:
+Na Windowsie można też użyć:
 
+```bash
 py main.py
+```
 
-Po uruchomieniu program pobierze pytania z Open Trivia Database API i rozpocznie grę w konsoli.
+Po uruchomieniu program pobiera pytania z API i rozpoczyna grę w konsoli.
 
-🎯 Jak grać
+## Sterowanie w grze
 
-Po wyświetleniu pytania wpisz jedną z odpowiedzi:
+Po wyświetleniu pytania należy wpisać jedną z odpowiedzi:
 
+```text
 A
 B
 C
 D
+```
 
-Przykład:
+Można też użyć koła ratunkowego:
 
-Pytanie za 500 zł
-
-What is the capital of France?
-A. Berlin
-B. Paris
-C. Madrid
-D. Rome
-
-Twoja odpowiedź: B
-
-Możesz też skorzystać z kół ratunkowych:
-
+```text
 50  - koło 50/50
 P   - pytanie do publiczności
 T   - telefon do przyjaciela
-🧪 Testy
+```
 
-Projekt zawiera proste testy jednostkowe napisane z użyciem biblioteki pytest.
+## Testy
+
+Projekt zawiera podstawowe testy jednostkowe napisane przy użyciu biblioteki `pytest`.
 
 Testy sprawdzają między innymi:
 
-formatowanie kwot,
-działanie koła 50/50,
-działanie pytania do publiczności,
-przekształcanie pytania z API do formatu używanego przez grę.
-Instalacja pytest
+* formatowanie kwot,
+* działanie koła 50/50,
+* działanie pytania do publiczności,
+* przekształcanie pytania z API do formatu używanego w grze.
+
+Instalacja pytest:
+
+```bash
 python -m pip install pytest
-Uruchomienie testów
+```
+
+Uruchomienie testów:
+
+```bash
 python -m pytest
+```
 
 Przykładowy poprawny wynik:
 
+```text
 6 passed
-🧰 Technologie
-Technologia	Zastosowanie
-Python	główny język projektu
-JSON	format danych zwracany przez API i zapis wyników
-urllib	pobieranie danych z internetu
-random	mieszanie odpowiedzi i losowanie podpowiedzi
-html	odkodowanie znaków specjalnych z API
-pytest	testy jednostkowe
-Git / GitHub	kontrola wersji i udostępnienie projektu
-🧠 Cel projektu
+```
 
-Celem projektu było przygotowanie prostej gry w Pythonie, która:
+## Wykorzystane elementy Pythona
 
-jest podzielona na czytelne moduły,
-działa w konsoli,
-korzysta z zewnętrznego API,
-posiada proste testy jednostkowe,
-jest możliwa do omówienia linijka po linijce.
+W projekcie zostały wykorzystane między innymi:
 
-Projekt został przygotowany tak, aby kod był możliwie prosty, czytelny i zrozumiały dla osoby początkującej.
+* funkcje,
+* listy i słowniki,
+* pętle,
+* instrukcje warunkowe,
+* obsługa plików JSON,
+* pobieranie danych z internetu,
+* losowanie,
+* testy jednostkowe.
 
-📚 Najważniejsze pliki
-Plik	Rola w projekcie
-main.py	start programu i główna pętla gry
-questions.py	pobieranie pytań z API i konwersja danych
-game.py	zadawanie pytań i obsługa odpowiedzi gracza
-lifelines.py	logika kół ratunkowych
-results.py	zapis wyniku do pliku
-config.py	lista progów wygranej
-utils.py	funkcje pomocnicze
-tests/	testy jednostkowe
+## Cel projektu
 
-<div align="center">
+Celem projektu było przygotowanie prostej gry w Pythonie, która jest podzielona na kilka plików, korzysta z zewnętrznego API i posiada podstawowe testy.
 
-🎉 Projekt zaliczeniowy — Python
-
-</div>
+Projekt został napisany w możliwie prosty sposób, tak aby można było dokładnie wyjaśnić działanie poszczególnych plików i funkcji.
